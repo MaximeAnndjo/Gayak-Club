@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>My Stats</title>
+  <style>
+    body { font-family:'Inter',sans-serif; padding:2rem; background:#f9f9f9; max-width:900px; margin:auto; }
+    nav { margin-bottom:1rem; }
+    nav a { margin-right:1rem; color:#111827; text-decoration:none; }
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th,td { padding:0.75rem; border:1px solid #ccc; text-align:left; }
+    .summary { margin-top:1.5rem; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Marketplace</a>
+    <a href="user-dashboard.html">Back to Dashboard</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+
+  <h1>📈 My Earnings & Listings</h1>
+
+  <table id="statsTable" style="display:none">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Price</th>
+        <th>Admin Cut</th>
+        <th>You Earn</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="statsSummary" class="summary"></div>
+
+  <script>
+    const commissionRate = 0.10; // 10%
+
+    async function loadStats() {
+      // read userId from URL ?userId=...
+      const params = new URLSearchParams(window.location.search);
+      const uid = params.get('userId');
+      if (!uid) {
+        return alert('No user ID provided.');
+      }
+
+      // fetch all listings
+      const res  = await fetch('/listings');
+      const data = await res.json();
+      const mine = data.filter(l => l.userId === uid);
+
+      const table      = document.getElementById('statsTable');
+      const tbody      = table.querySelector('tbody');
+      const summaryDiv = document.getElementById('statsSummary');
+
+      if (mine.length === 0) {
+        summaryDiv.innerText = 'You have no listings.';
+        return;
+      }
+
+      let totalEarn = 0, totalCut = 0;
+      tbody.innerHTML = '';
+
+      mine.forEach(item => {
+        const cut  = +(item.price * commissionRate).toFixed(2);
+        const earn = +(item.price - cut).toFixed(2);
+        totalEarn += earn;
+        totalCut   += cut;
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.title}</td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td>$${cut.toFixed(2)}</td>
+            <td>$${earn.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      table.style.display = 'table';
+      summaryDiv.innerText = 
+        `Listings: ${mine.length} | You Earned: $${totalEarn.toFixed(2)} | Admin Cut: $${totalCut.toFixed(2)}`;
+    }
+
+    // run on page load
+    window.addEventListener('DOMContentLoaded', loadStats);
+  </script>
+</body>
+</html>
