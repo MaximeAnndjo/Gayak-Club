@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>User Dashboard</title>
+  <style>
+    body { font-family:'Inter',sans-serif; padding:2rem; background:#f0f0f0; max-width:900px; margin:auto; }
+    nav { margin-bottom:1rem; }
+    nav a { margin-right:1rem; color:#111827; text-decoration:none; }
+    input, button { padding:0.75rem; margin-right:0.5rem; border-radius:4px; border:1px solid #ccc; }
+    button { background:#111827; color:white; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Marketplace</a>
+    <a href="admin.html">Admin</a>
+  </nav>
+
+  <h1>📊 Your Dashboard</h1>
+  <div>
+    <input id="userIdInput" type="text" placeholder="Enter Your User ID"/>
+    <button onclick="goToStats()">View My Stats</button>
+  </div>
+
+  <script>
+    function goToStats() {
+      const uid = document.getElementById('userIdInput').value.trim();
+      if (!uid) return alert('Please enter your User ID.');
+      // Redirect to the new stats page with userId in query string
+      window.location.href = `view-stats.html?userId=${encodeURIComponent(uid)}`;
+    }
+  </script>
+</body>
+</html>
